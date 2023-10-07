@@ -12,6 +12,9 @@ dependencies:
     sdk: flutter
   cupertino_icons: ^1.0.2
   multi_dropdown: ^2.1.0
+  serial: ^0.0.4
+  isolate_manager: ^4.1.2
+  flutter_expandable_table: ^2.0.1
 
 dev_dependencies:
   flutter_test:

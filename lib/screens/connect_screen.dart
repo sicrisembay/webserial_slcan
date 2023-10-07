@@ -1,8 +1,14 @@
+import 'dart:html';
+
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:multi_dropdown/models/value_item.dart';
 import 'package:multi_dropdown/multiselect_dropdown.dart';
+import 'package:serial/serial.dart';
 import 'package:webserial_slcan/components/bottom_button.dart';
+import 'package:webserial_slcan/components/can_adapter.dart';
 import 'package:webserial_slcan/components/can_message.dart';
+import 'package:webserial_slcan/globals.dart';
+import 'package:webserial_slcan/screens/main_screen.dart';
 
 class ConnectScreen extends StatefulWidget {
   const ConnectScreen({super.key});
@@ -105,9 +111,9 @@ class _ConnectScreenState extends State<ConnectScreen> {
               BottomButton(
                   label: 'CONNECT',
                   onTap: () async {
-                    CanType canType = CanType.CAN;
-                    CanIdType idType = CanIdType.BASE;
-                    CanNominalRate nominalRate = CanNominalRate.NRATE1000;
+                    CanType canType = CanType.can;
+                    CanIdType idType = CanIdType.base;
+                    CanNominalRate nominalRate = CanNominalRate.nRate1000;
                     switch (_canType.label) {
                       case kStrCan:
                         {
@@ -115,8 +121,20 @@ class _ConnectScreenState extends State<ConnectScreen> {
                         }
                       default:
                         {
-                          canType = CanType.CAN;
+                          canType = CanType.can;
                         }
+                    }
+                    try {
+                      final port = await window.navigator.serial.requestPort();
+                      await port.open(baudRate: 115200);
+                      canAdapter = CanAdapter(port: port);
+                      await canAdapter?.connect(
+                          type: canType, idType: idType, nRate: nominalRate);
+                      setState(() {
+                        Navigator.pushNamed(context, MainScreen.id);
+                      });
+                    } catch (e) {
+                      if (kDebugMode) print(e);
                     }
                   }),
             ],
